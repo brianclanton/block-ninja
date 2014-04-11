@@ -11,6 +11,16 @@ public class PlayerController: MonoBehaviour {
 	public float jumpHeight = 6;
 	public float wallHoldLength = 0.5f;
 	private float wallHoldTimer = 0;
+	[HideInInspector]
+	public float hitPoints;
+	public float maxHitPoints = 10;
+
+	// Sound clips
+	public AudioClip swordSwipeSFX;
+	public AudioClip jump1SFX;
+	public AudioClip jump2SFX;
+	public AudioClip wallJumpSFX;
+	public AudioClip landSFX;
 
 	// System
 	private float currentSpeed;
@@ -32,8 +42,10 @@ public class PlayerController: MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		playerPhysics = GetComponent<PlayerPhysics>();
+		playerPhysics.SetLandingAudio(audio, landSFX);
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 		sword.gameObject.SetActive(false);
+		hitPoints = maxHitPoints;
 	}
 	
 	// Update is called once per frame
@@ -60,6 +72,7 @@ public class PlayerController: MonoBehaviour {
 			if (!wallHolding) {
 				if (playerPhysics.canWallHold) {
 					wallHolding = true;
+					audio.PlayOneShot(wallJumpSFX);
 				}
 			}
 		}
@@ -67,6 +80,8 @@ public class PlayerController: MonoBehaviour {
 		if (Input.GetButtonDown("Jump")) {
 			if (playerPhysics.grounded || wallHolding) {
 				amountToMove.y = jumpHeight;
+
+				audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
 				
 				if (wallHolding) {
                     wallHolding = false;
@@ -89,6 +104,7 @@ public class PlayerController: MonoBehaviour {
 			attacking = true;
 			sword.gameObject.SetActive(true);
 			animation.CrossFade("Attack");
+			audio.PlayOneShot(swordSwipeSFX);
 		}
 
 		// Adjust current speed based on target speed
@@ -119,6 +135,21 @@ public class PlayerController: MonoBehaviour {
 
 	private void Attack() {
 
+	}
+
+	public void TakeDamage(float damage, float dir) {
+		hitPoints -= damage;
+		hitPoints = Mathf.Max(0, hitPoints);
+
+		if (hitPoints == 0) {
+			Die();
+		} else {
+			playerPhysics.Move(new Vector2(1, 0), dir);
+		}
+	}
+
+	private void Die() {
+		Debug.Log("You died");
 	}
 
 	// Increment current speed towards target speed using given acceleration

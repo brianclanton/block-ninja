@@ -34,6 +34,12 @@ public class EnemyController : MonoBehaviour {
 		transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
+	void OnTriggerEnter(Collider other) {
+		if (other.gameObject.tag == "Player") {
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, other.transform.position.x - transform.position.x);
+		}
+	}
+
 	public void Die() {
 		Debug.Log("Enemy killed");
 		Destroy(gameObject);
