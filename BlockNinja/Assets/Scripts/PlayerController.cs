@@ -43,6 +43,9 @@ public class PlayerController: MonoBehaviour {
 			targetSpeed = 0;
 			currentSpeed = 0;
 		}
+		
+		// Input
+		moveDirX = Input.GetAxisRaw("Horizontal");
 
 		// Allow for jumping
 		if (playerPhysics.grounded) {
@@ -72,7 +75,6 @@ public class PlayerController: MonoBehaviour {
             }
         }
 
-
 		if (attacking) {
 			attackTimer += Time.deltaTime;
 
@@ -83,14 +85,11 @@ public class PlayerController: MonoBehaviour {
 			}
 		}
 
-		if (!attacking && Input.GetButtonDown("Attack")) {
+		if (!attacking && !wallHolding && Input.GetButtonDown("Attack")) {
 			attacking = true;
 			sword.gameObject.SetActive(true);
 			animation.CrossFade("Attack");
 		}
-
-		// Input
-		moveDirX = Input.GetAxisRaw("Horizontal");
 
 		// Adjust current speed based on target speed
 		targetSpeed = moveDirX * speed;
@@ -107,11 +106,6 @@ public class PlayerController: MonoBehaviour {
 				amountToMove.y = wallHoldTimer >= wallHoldLength ?
 					amountToMove.y + gravity / 2 * Time.deltaTime :
 					gravity * Time.deltaTime;
-			}
-		} else {
-			if (Input.GetButtonDown("Attack")) {
-				Debug.Log("Woosh");
-				//sword.Swing();
 			}
 		}
 
