@@ -21,6 +21,7 @@ public class PlayerController: MonoBehaviour {
 	public AudioClip jump2SFX;
 	public AudioClip wallJumpSFX;
 	public AudioClip landSFX;
+	public AudioClip gruntSFX;
 
 	// System
 	private float currentSpeed;
@@ -104,7 +105,7 @@ public class PlayerController: MonoBehaviour {
 			attacking = true;
 			sword.gameObject.SetActive(true);
 			animation.CrossFade("Attack");
-			audio.PlayOneShot(swordSwipeSFX);
+			audio.PlayOneShot(swordSwipeSFX, 0.5f);
 		}
 
 		// Adjust current speed based on target speed
@@ -145,6 +146,7 @@ public class PlayerController: MonoBehaviour {
 			Die();
 		} else {
 			playerPhysics.Move(new Vector2(1, 0), dir);
+			audio.PlayOneShot(gruntSFX);
 		}
 	}
 

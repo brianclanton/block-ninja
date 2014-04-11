@@ -51,7 +51,7 @@ public class EnemyController : MonoBehaviour {
 		if (hitPoints == 0) {
 			Die();
 		} else {
-			rigidbody.AddForce(Vector3.right * dir * 2);
+			transform.Translate(0.5f * -dir, 0, 0);
 		}
 	}
 
