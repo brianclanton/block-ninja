@@ -1,0 +1,137 @@
+﻿using UnityEngine;
+using System.Collections;
+
+[RequireComponent (typeof(PlayerPhysics))]
+public class PlayerController: MonoBehaviour {
+
+	// Player handling
+	public float gravity = 20;
+	public float speed = 8;
+	public float acceleration = 40;
+	public float jumpHeight = 6;
+	public float wallHoldLength = 0.5f;
+	private float wallHoldTimer = 0;
+
+	// System
+	private float currentSpeed;
+	private float targetSpeed;
+	private Vector2 amountToMove;
+	private float moveDirX;
+
+	// Weapons
+	private Sword sword;
+
+	// States
+	private bool wallHolding;
+	private bool attacking;
+
+	private PlayerPhysics playerPhysics;
+
+	private float attackTimer = 0;
+
+	// Use this for initialization
+	void Start () {
+		playerPhysics = GetComponent<PlayerPhysics>();
+		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
+		sword.gameObject.SetActive(false);
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		// Check that movement hasn't been stopped by a horizontal collision
+		if (playerPhysics.movementStopped) {
+			targetSpeed = 0;
+			currentSpeed = 0;
+		}
+		
+		// Input
+		moveDirX = Input.GetAxisRaw("Horizontal");
+
+		// Allow for jumping
+		if (playerPhysics.grounded) {
+			amountToMove.y = 0;
+
+			if (wallHolding) {
+				wallHolding = false;
+				wallHoldTimer = 0;
+			}
+
+		} else {
+			if (!wallHolding) {
+				if (playerPhysics.canWallHold) {
+					wallHolding = true;
+				}
+			}
+		}
+
+		if (Input.GetButtonDown("Jump")) {
+			if (playerPhysics.grounded || wallHolding) {
+				amountToMove.y = jumpHeight;
+				
+				if (wallHolding) {
+                    wallHolding = false;
+					wallHoldTimer = 0;
+                }
+            }
+        }
+
+		if (attacking) {
+			attackTimer += Time.deltaTime;
+
+			if (attackTimer >= animation["Attack"].length) {
+				attacking = false;
+				attackTimer = 0;
+				sword.gameObject.SetActive(false);
+			}
+		}
+
+		if (!attacking && !wallHolding && Input.GetButtonDown("Attack")) {
+			attacking = true;
+			sword.gameObject.SetActive(true);
+			animation.CrossFade("Attack");
+		}
+
+		// Adjust current speed based on target speed
+		targetSpeed = moveDirX * speed;
+		currentSpeed = IncrementTowards(currentSpeed, targetSpeed, acceleration);
+
+		// Set amount to move
+		amountToMove.x = currentSpeed;
+
+		if (wallHolding) {
+			wallHoldTimer += Time.deltaTime;
+			amountToMove.x = 0;
+
+			if (Input.GetAxisRaw("Vertical") != -1) {
+				amountToMove.y = wallHoldTimer >= wallHoldLength ?
+					amountToMove.y + gravity / 2 * Time.deltaTime :
+					gravity * Time.deltaTime;
+			}
+		}
+
+		amountToMove.y -= gravity * Time.deltaTime;
+		playerPhysics.Move(amountToMove * Time.deltaTime, moveDirX);
+
+		// Face Direction
+		if (moveDirX != 0 && !wallHolding)
+			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
+	}
+
+	private void Attack() {
+
+	}
+
+	// Increment current speed towards target speed using given acceleration
+	private float IncrementTowards(float current, float target, float a) {
+		if (current == target)
+			return current;
+		else {
+			float dir = Mathf.Sign(target - current);
+			current += a * Time.deltaTime * dir;
+
+			// Return target if we've reached that speed in the specified direction
+			return dir == Mathf.Sign(target - current) ? current : target;
+		}
+	}
+
+}
