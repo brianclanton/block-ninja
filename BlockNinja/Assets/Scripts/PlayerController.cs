@@ -9,6 +9,8 @@ public class PlayerController: MonoBehaviour {
 	public float speed = 8;
 	public float acceleration = 40;
 	public float jumpHeight = 6;
+	public float wallHoldLength = 0.5f;
+	private float wallHoldTimer = 0;
 
 	// System
 	private float currentSpeed;
@@ -23,11 +25,13 @@ public class PlayerController: MonoBehaviour {
 	private bool wallHolding;
 
 	private PlayerPhysics playerPhysics;
+	private Animator animator;
 
 	// Use this for initialization
 	void Start () {
 		playerPhysics = GetComponent<PlayerPhysics>();
-		sword = transform.Find("Sword").gameObject.GetComponent<Sword>();
+		animator = GetComponent<Animator>();
+		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 	}
 	
 	// Update is called once per frame
@@ -44,6 +48,7 @@ public class PlayerController: MonoBehaviour {
 
 			if (wallHolding) {
 				wallHolding = false;
+				wallHoldTimer = 0;
 			}
 
 		} else {
@@ -60,10 +65,14 @@ public class PlayerController: MonoBehaviour {
 				
 				if (wallHolding) {
                     wallHolding = false;
-                    
+					wallHoldTimer = 0;
                 }
             }
         }
+
+		if (Input.GetButtonDown("Attack")) {
+			animation.CrossFade("Attack");
+		}
 
 		// Input
 		moveDirX = Input.GetAxisRaw("Horizontal");
@@ -76,15 +85,18 @@ public class PlayerController: MonoBehaviour {
 		amountToMove.x = currentSpeed;
 
 		if (wallHolding) {
+			wallHoldTimer += Time.deltaTime;
 			amountToMove.x = 0;
 
 			if (Input.GetAxisRaw("Vertical") != -1) {
-				amountToMove.y = 0;
+				amountToMove.y = wallHoldTimer >= wallHoldLength ?
+					amountToMove.y + gravity / 2 * Time.deltaTime :
+					gravity * Time.deltaTime;
 			}
 		} else {
-			if (!sword.swinging && Input.GetButtonDown("Fire1")) {
+			if (Input.GetButtonDown("Attack")) {
 				Debug.Log("Woosh");
-				sword.Swing();
+				//sword.Swing();
 			}
 		}
 
@@ -93,7 +105,11 @@ public class PlayerController: MonoBehaviour {
 
 		// Face Direction
 		if (moveDirX != 0 && !wallHolding)
-			transform.eulerAngles = moveDirX > 0 ? Vector3.up * 180 : Vector3.zero;
+			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
+	}
+
+	private void Attack() {
+
 	}
 
 	// Increment current speed towards target speed using given acceleration
