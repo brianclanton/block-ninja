@@ -4,6 +4,7 @@ using System.Collections;
 public class GameCamera : MonoBehaviour {
 
 	public float trackSpeed = 10;
+	public GameObject background;
 
 	private Transform target;
 
@@ -18,6 +19,7 @@ public class GameCamera : MonoBehaviour {
 			float y = IncrementTowards(transform.position.y, target.position.y, trackSpeed);
 
 			transform.position = new Vector3(x, y, transform.position.z);
+			background.transform.position = new Vector3(x, y, background.transform.position.z);
 		}
 	}
 
