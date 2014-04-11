@@ -129,7 +129,7 @@ public class PlayerController: MonoBehaviour {
 		playerPhysics.Move(amountToMove * Time.deltaTime, moveDirX);
 
 		// Face Direction
-		if (moveDirX != 0 && !wallHolding)
+		if (moveDirX != 0 && !wallHolding && !attacking)
 			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
