@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent (typeof(PlayerPhysics))]
 public class PlayerController: MonoBehaviour {
 
+	public GameCamera camera;
+
 	// Player handling
 	public float gravity = 20;
 	public float speed = 8;
@@ -40,12 +42,15 @@ public class PlayerController: MonoBehaviour {
 
 	private float attackTimer = 0;
 
+	private GameManager manager;
+
 	// Use this for initialization
 	void Start () {
 		playerPhysics = GetComponent<PlayerPhysics>();
 		playerPhysics.SetLandingAudio(audio, landSFX);
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 		sword.gameObject.SetActive(false);
+		manager = camera.GetComponent<GameManager>();
 		hitPoints = maxHitPoints;
 	}
 	
@@ -152,6 +157,8 @@ public class PlayerController: MonoBehaviour {
 
 	private void Die() {
 		Debug.Log("You died");
+		Destroy(gameObject);
+		manager.SpawnPlayer();
 	}
 
 	// Increment current speed towards target speed using given acceleration

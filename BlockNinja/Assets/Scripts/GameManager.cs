@@ -12,9 +12,10 @@ public class GameManager : MonoBehaviour {
 		cam = GetComponent<GameCamera>();
 		SpawnPlayer();
 	}
-	
-	private void SpawnPlayer() {
+
+	public void SpawnPlayer() {
 		// Set the camera target to the player
 		cam.SetTarget((Instantiate(player, new Vector3(0, 2, 0), Quaternion.identity) as GameObject).transform);
 	}
+
 }
