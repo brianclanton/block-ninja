@@ -5,6 +5,7 @@ public class EnemyController : MonoBehaviour {
 
 	public float movementRange = 2;
 	public float movementSpeed = 2;
+	public float hitPoints = 2;
 
 	private float currentPosition;
 	private float deltaPosition;
@@ -22,7 +23,7 @@ public class EnemyController : MonoBehaviour {
 
 		transform.Translate(deltaPosition * currentDirection, 0, 0);
 		currentPosition += deltaPosition;
-		Debug.Log(currentPosition);
+		//Debug.Log(currentPosition);
 
 		if (Mathf.Abs(currentPosition) >= movementRange / 2) {
 			currentPosition = movementRange / 2 * currentDirection;
@@ -35,6 +36,17 @@ public class EnemyController : MonoBehaviour {
 
 	public void Die() {
 		Debug.Log("Enemy killed");
+		Destroy(gameObject);
+	}
+
+	public void TakeDamage(float damage, float dir) {
+		hitPoints -= damage;
+		hitPoints = Mathf.Max(0, hitPoints);
+		if (hitPoints == 0) {
+			Die();
+		} else {
+			rigidbody.AddForce(Vector3.right * dir * 2);
+		}
 	}
 
 	private float IncrementTowards(float current, float target, float a) {
