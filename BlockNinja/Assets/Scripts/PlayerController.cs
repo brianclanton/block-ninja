@@ -43,7 +43,9 @@ public class PlayerController: MonoBehaviour {
 			targetSpeed = 0;
 			currentSpeed = 0;
 		}
-		
+
+		amountToMove.x = 0;
+
 		// Input
 		moveDirX = Input.GetAxisRaw("Horizontal");
 
@@ -67,6 +69,12 @@ public class PlayerController: MonoBehaviour {
 		if (Input.GetButtonDown("Jump")) {
 			if (playerPhysics.grounded || wallHolding) {
 				amountToMove.y = jumpHeight;
+				Debug.Log(moveDirX == -1 && transform.eulerAngles.Equals(Vector3.up * 180));
+				Debug.Log(moveDirX == 1 && transform.eulerAngles.Equals(Vector3.zero));
+				if (moveDirX == -1 && transform.eulerAngles.Equals(Vector3.zero)
+				    || moveDirX == 1 && transform.eulerAngles.Equals(Vector3.up * 180)) {
+					amountToMove.x += 100 * -moveDirX;
+				}
 				
 				if (wallHolding) {
                     wallHolding = false;
@@ -96,7 +104,7 @@ public class PlayerController: MonoBehaviour {
 		currentSpeed = IncrementTowards(currentSpeed, targetSpeed, acceleration);
 
 		// Set amount to move
-		amountToMove.x = currentSpeed;
+		amountToMove.x += currentSpeed;
 
 		if (wallHolding) {
 			wallHoldTimer += Time.deltaTime;
