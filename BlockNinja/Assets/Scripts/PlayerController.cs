@@ -23,15 +23,17 @@ public class PlayerController: MonoBehaviour {
 
 	// States
 	private bool wallHolding;
+	private bool attacking;
 
 	private PlayerPhysics playerPhysics;
-	private Animator animator;
+
+	private float attackTimer = 0;
 
 	// Use this for initialization
 	void Start () {
 		playerPhysics = GetComponent<PlayerPhysics>();
-		animator = GetComponent<Animator>();
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
+		sword.gameObject.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -70,7 +72,20 @@ public class PlayerController: MonoBehaviour {
             }
         }
 
-		if (Input.GetButtonDown("Attack")) {
+
+		if (attacking) {
+			attackTimer += Time.deltaTime;
+
+			if (attackTimer >= animation["Attack"].length) {
+				attacking = false;
+				attackTimer = 0;
+				sword.gameObject.SetActive(false);
+			}
+		}
+
+		if (!attacking && Input.GetButtonDown("Attack")) {
+			attacking = true;
+			sword.gameObject.SetActive(true);
 			animation.CrossFade("Attack");
 		}
 
