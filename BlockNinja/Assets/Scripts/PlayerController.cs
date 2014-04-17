@@ -30,6 +30,7 @@ public class PlayerController: MonoBehaviour {
 	private float targetSpeed;
 	private Vector2 amountToMove;
 	private float moveDirX;
+	private float wallHoldDir;
 
 	// Weapons
 	private Sword sword;
@@ -64,6 +65,7 @@ public class PlayerController: MonoBehaviour {
 		
 		// Input
 		moveDirX = Input.GetAxisRaw("Horizontal");
+		Debug.Log(moveDirX);
 
 		// Allow for jumping
 		if (playerPhysics.grounded) {
@@ -76,15 +78,16 @@ public class PlayerController: MonoBehaviour {
 
 		} else {
 			if (!wallHolding) {
-				if (playerPhysics.canWallHold) {
+				if (playerPhysics.canWallHold && moveDirX != 0) {
 					wallHolding = true;
 					audio.PlayOneShot(wallJumpSFX);
+					wallHoldDir = moveDirX;
 				}
 			}
 		}
 
 		if (Input.GetButtonDown("Jump")) {
-			if (playerPhysics.grounded || wallHolding) {
+			if (playerPhysics.grounded || wallHolding && moveDirX + wallHoldDir == 0) {
 				amountToMove.y = jumpHeight;
 
 				audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
@@ -123,6 +126,9 @@ public class PlayerController: MonoBehaviour {
 		if (wallHolding) {
 			wallHoldTimer += Time.deltaTime;
 			amountToMove.x = 0;
+
+			//if (wallHoldTimer >= wallHoldLength)
+			//	wallHoldDir = 0;
 
 			if (Input.GetAxisRaw("Vertical") != -1) {
 				amountToMove.y = wallHoldTimer >= wallHoldLength ?

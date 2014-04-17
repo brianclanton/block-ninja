@@ -1,8 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="..\..\Independent Study\leap-demo\Leap Demo\Assets\Scripts\LeapReadout.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerController.cs">
     <Files>
-      <File FileName="..\..\Independent Study\leap-demo\Leap Demo\Assets\Scripts\LeapReadout.cs" Line="24" Column="33" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="23" Column="28" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
