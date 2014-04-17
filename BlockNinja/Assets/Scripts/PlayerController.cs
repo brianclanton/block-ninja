@@ -50,7 +50,7 @@ public class PlayerController: MonoBehaviour {
 		playerPhysics.SetLandingAudio(audio, landSFX);
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 		sword.gameObject.SetActive(false);
-		manager = camera.GetComponent<GameManager>();
+		//manager = camera.GetComponent<GameManager>();
 		hitPoints = maxHitPoints;
 	}
 	
@@ -158,7 +158,7 @@ public class PlayerController: MonoBehaviour {
 	private void Die() {
 		Debug.Log("You died");
 		Destroy(gameObject);
-		manager.SpawnPlayer();
+		//manager.SpawnPlayer();
 	}
 
 	// Increment current speed towards target speed using given acceleration
