@@ -24,11 +24,21 @@ public class PlayerPhysics : MonoBehaviour {
 
 	Ray ray;
 	RaycastHit hit;
+	
+	private bool lastGroundedState;
+
+	private AudioSource audio;
+	private AudioClip landSFX;
 
 	void Start() {
 		collider = GetComponent<BoxCollider>();
 		s = collider.size;
 		c = collider.center;
+	}
+
+	public void SetLandingAudio(AudioSource audio, AudioClip clip) {
+		this.audio = audio;
+		landSFX = clip;
 	}
 
 	public void Move(Vector2 moveAmount, float moveDirX) {
@@ -115,5 +125,10 @@ public class PlayerPhysics : MonoBehaviour {
 		Vector2 finalTransform = new Vector2(deltaX, deltaY);
 
 		transform.Translate(finalTransform, Space.World);
+
+		if (lastGroundedState != grounded)
+			audio.PlayOneShot(landSFX);
+
+		lastGroundedState = grounded;
 	}
 }

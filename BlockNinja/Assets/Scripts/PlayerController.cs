@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent (typeof(PlayerPhysics))]
 public class PlayerController: MonoBehaviour {
 
+	public GameCamera camera;
+
 	// Player handling
 	public float gravity = 20;
 	public float speed = 8;
@@ -11,6 +13,17 @@ public class PlayerController: MonoBehaviour {
 	public float jumpHeight = 6;
 	public float wallHoldLength = 0.5f;
 	private float wallHoldTimer = 0;
+	[HideInInspector]
+	public float hitPoints;
+	public float maxHitPoints = 10;
+
+	// Sound clips
+	public AudioClip swordSwipeSFX;
+	public AudioClip jump1SFX;
+	public AudioClip jump2SFX;
+	public AudioClip wallJumpSFX;
+	public AudioClip landSFX;
+	public AudioClip gruntSFX;
 
 	// System
 	private float currentSpeed;
@@ -29,11 +42,16 @@ public class PlayerController: MonoBehaviour {
 
 	private float attackTimer = 0;
 
+	private GameManager manager;
+
 	// Use this for initialization
 	void Start () {
 		playerPhysics = GetComponent<PlayerPhysics>();
+		playerPhysics.SetLandingAudio(audio, landSFX);
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 		sword.gameObject.SetActive(false);
+		//manager = camera.GetComponent<GameManager>();
+		hitPoints = maxHitPoints;
 	}
 	
 	// Update is called once per frame
@@ -60,6 +78,7 @@ public class PlayerController: MonoBehaviour {
 			if (!wallHolding) {
 				if (playerPhysics.canWallHold) {
 					wallHolding = true;
+					audio.PlayOneShot(wallJumpSFX);
 				}
 			}
 		}
@@ -67,6 +86,8 @@ public class PlayerController: MonoBehaviour {
 		if (Input.GetButtonDown("Jump")) {
 			if (playerPhysics.grounded || wallHolding) {
 				amountToMove.y = jumpHeight;
+
+				audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
 				
 				if (wallHolding) {
                     wallHolding = false;
@@ -89,6 +110,7 @@ public class PlayerController: MonoBehaviour {
 			attacking = true;
 			sword.gameObject.SetActive(true);
 			animation.CrossFade("Attack");
+			audio.PlayOneShot(swordSwipeSFX, 0.5f);
 		}
 
 		// Adjust current speed based on target speed
@@ -113,12 +135,30 @@ public class PlayerController: MonoBehaviour {
 		playerPhysics.Move(amountToMove * Time.deltaTime, moveDirX);
 
 		// Face Direction
-		if (moveDirX != 0 && !wallHolding)
+		if (moveDirX != 0 && !wallHolding && !attacking)
 			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
 	private void Attack() {
 
+	}
+
+	public void TakeDamage(float damage, float dir) {
+		hitPoints -= damage;
+		hitPoints = Mathf.Max(0, hitPoints);
+
+		if (hitPoints == 0) {
+			Die();
+		} else {
+			playerPhysics.Move(new Vector2(1, 0), dir);
+			audio.PlayOneShot(gruntSFX);
+		}
+	}
+
+	private void Die() {
+		Debug.Log("You died");
+		Destroy(gameObject);
+		//manager.SpawnPlayer();
 	}
 
 	// Increment current speed towards target speed using given acceleration

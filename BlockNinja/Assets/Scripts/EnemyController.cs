@@ -34,6 +34,12 @@ public class EnemyController : MonoBehaviour {
 		transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
+	void OnTriggerEnter(Collider other) {
+		if (other.gameObject.tag == "Player") {
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, other.transform.position.x - transform.position.x);
+		}
+	}
+
 	public void Die() {
 		Debug.Log("Enemy killed");
 		Destroy(gameObject);
@@ -45,7 +51,7 @@ public class EnemyController : MonoBehaviour {
 		if (hitPoints == 0) {
 			Die();
 		} else {
-			rigidbody.AddForce(Vector3.right * dir * 2);
+			transform.Translate(0.5f * -dir, 0, 0);
 		}
 	}
 
