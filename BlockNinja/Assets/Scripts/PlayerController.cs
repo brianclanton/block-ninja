@@ -77,7 +77,7 @@ public class PlayerController: MonoBehaviour {
 
 		} else {
 			if (!wallHolding) {
-				if (playerPhysics.canWallHold) {
+				if (playerPhysics.canWallHold && moveDirX != 0) {
 					wallHolding = true;
 					audio.PlayOneShot(wallJumpSFX);
 					wallHoldDir = moveDirX;
