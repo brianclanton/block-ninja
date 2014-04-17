@@ -30,6 +30,7 @@ public class PlayerController: MonoBehaviour {
 	private float targetSpeed;
 	private Vector2 amountToMove;
 	private float moveDirX;
+	private float wallHoldDir;
 
 	// Weapons
 	private Sword sword;
@@ -79,12 +80,13 @@ public class PlayerController: MonoBehaviour {
 				if (playerPhysics.canWallHold) {
 					wallHolding = true;
 					audio.PlayOneShot(wallJumpSFX);
+					wallHoldDir = moveDirX;
 				}
 			}
 		}
 
 		if (Input.GetButtonDown("Jump")) {
-			if (playerPhysics.grounded || wallHolding) {
+			if (playerPhysics.grounded || wallHolding && moveDirX != wallHoldDir) {
 				amountToMove.y = jumpHeight;
 
 				audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
