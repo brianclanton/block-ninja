@@ -10,6 +10,16 @@ public class EnemyController : MonoBehaviour {
 	private float currentPosition;
 	private float deltaPosition;
 	private float currentDirection;
+	
+	private float knockBackDirection;
+	private float friction = 20;
+	private float velocityX;
+
+	// States
+	private bool knockedBack;
+
+	// Sound FX
+	public AudioClip gruntSFX;
 
 	// Use this for initialization
 	void Start () {
@@ -19,19 +29,37 @@ public class EnemyController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		deltaPosition = IncrementTowards(currentPosition, movementRange / 2 * currentDirection, movementSpeed) - currentPosition;
+		if (!knockedBack) {
+			deltaPosition = IncrementTowards(currentPosition, movementRange / 2 * currentDirection, movementSpeed) - currentPosition;
+			
+			transform.Translate(deltaPosition * currentDirection, 0, 0);
+			currentPosition += deltaPosition;
+			//Debug.Log(currentPosition);
+			
+			if (Mathf.Abs(currentPosition) >= movementRange / 2) {
+				currentPosition = movementRange / 2 * currentDirection;
+				currentDirection *= -1;
+			}
 
-		transform.Translate(deltaPosition * currentDirection, 0, 0);
-		currentPosition += deltaPosition;
-		//Debug.Log(currentPosition);
+			// Face Direction
+			transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+		} else {
+			velocityX -= friction * knockBackDirection * Time.deltaTime;
+			deltaPosition = velocityX * Time.deltaTime;
 
-		if (Mathf.Abs(currentPosition) >= movementRange / 2) {
-			currentPosition = movementRange / 2 * currentDirection;
-			currentDirection *= -1;
+			transform.Translate(deltaPosition, 0, 0);
+
+			if (Mathf.Sign(velocityX) != Mathf.Sign(knockBackDirection)) {
+				knockedBack = false;
+				velocityX = 0;
+			}
 		}
+	}
 
-		// Face Direction
-		transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+	void OnTriggerEnter(Collider other) {
+		if (other.gameObject.tag == "Player") {
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x, 10);
+		}
 	}
 
 	public void Die() {
@@ -39,13 +67,22 @@ public class EnemyController : MonoBehaviour {
 		Destroy(gameObject);
 	}
 
-	public void TakeDamage(float damage, float dir) {
+	public void TakeDamage(float damage, float dir, float force) {
 		hitPoints -= damage;
 		hitPoints = Mathf.Max(0, hitPoints);
 		if (hitPoints == 0) {
 			Die();
 		} else {
-			rigidbody.AddForce(Vector3.right * dir * 2);
+			// transform.Translate(0.5f * -dir, 0, 0);
+			currentPosition = 0;
+			velocityX = force * -dir;
+			knockBackDirection = -dir;
+
+			// Face Direction
+			transform.eulerAngles = knockBackDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+			knockedBack = true;
+
+			audio.PlayOneShot(gruntSFX);
 		}
 	}
 
