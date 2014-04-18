@@ -145,6 +145,12 @@ public class PlayerController: MonoBehaviour {
 			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
+	void OnTriggerEnter(Collider other) {
+		if (other.tag == "Goal") {
+
+		}
+	}
+
 	private void Attack() {
 
 	}
