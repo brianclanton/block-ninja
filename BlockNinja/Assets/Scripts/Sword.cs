@@ -11,7 +11,7 @@ public class Sword : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.tag == "Enemy") {
-			other.gameObject.GetComponent<EnemyController>().TakeDamage(1, Mathf.Sign(other.transform.position.x - transform.position.x));
+			other.gameObject.GetComponent<EnemyController>().TakeDamage(1, Mathf.Sign(other.transform.position.x - transform.position.x), 5);
 		}
 	}
 }

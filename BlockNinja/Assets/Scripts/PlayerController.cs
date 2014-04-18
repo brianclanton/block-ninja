@@ -29,6 +29,9 @@ public class PlayerController: MonoBehaviour {
 	private Vector2 amountToMove;
 	private float moveDirX;
 	private float wallHoldDir;
+	private float knockBackDirection;
+	private float friction = 40;
+	private float velocityX;
 
 	// Weapons
 	private Sword sword;
@@ -36,6 +39,7 @@ public class PlayerController: MonoBehaviour {
 	// States
 	private bool wallHolding;
 	private bool attacking;
+	private bool knockedBack;
 
 	private PlayerPhysics playerPhysics;
 
@@ -60,86 +64,96 @@ public class PlayerController: MonoBehaviour {
 			targetSpeed = 0;
 			currentSpeed = 0;
 		}
-		
-		// Input
-		moveDirX = Input.GetAxisRaw("Horizontal");
 
-		// Allow for jumping
-		if (playerPhysics.grounded) {
-			amountToMove.y = 0;
-
-			if (wallHolding) {
-				wallHolding = false;
-				wallHoldTimer = 0;
+		if (knockedBack) {
+			velocityX -= friction * knockBackDirection * Time.deltaTime;
+			playerPhysics.Move(new Vector2(velocityX * Time.deltaTime, 0), knockBackDirection);
+			
+			if (Mathf.Sign(velocityX) != Mathf.Sign(knockBackDirection)) {
+				knockedBack = false;
+				velocityX = 0;
 			}
-
 		} else {
-			if (!wallHolding) {
-				if (playerPhysics.canWallHold && moveDirX != 0) {
-					wallHolding = true;
-					audio.PlayOneShot(wallJumpSFX);
-					wallHoldDir = moveDirX;
-				}
-			}
-		}
-
-		if (Input.GetButtonDown("Jump")) {
-			if (playerPhysics.grounded || wallHolding && moveDirX + wallHoldDir == 0) {
-				amountToMove.y = jumpHeight;
-
-				audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
+			// Input
+			moveDirX = Input.GetAxisRaw("Horizontal");
+			
+			// Allow for jumping
+			if (playerPhysics.grounded) {
+				amountToMove.y = 0;
 				
 				if (wallHolding) {
-                    wallHolding = false;
+					wallHolding = false;
 					wallHoldTimer = 0;
-                }
-            }
-        }
-
-		if (attacking) {
-			attackTimer += Time.deltaTime;
-
-			if (attackTimer >= animation["Attack"].length) {
-				attacking = false;
-				attackTimer = 0;
-				sword.gameObject.SetActive(false);
+				}
+				
+			} else {
+				if (!wallHolding) {
+					if (playerPhysics.canWallHold && moveDirX != 0) {
+						wallHolding = true;
+						audio.PlayOneShot(wallJumpSFX);
+						wallHoldDir = moveDirX;
+					}
+				}
 			}
-		}
-
-		if (!attacking && !wallHolding && Input.GetButtonDown("Attack")) {
-			attacking = true;
-			sword.gameObject.SetActive(true);
-			animation.CrossFade("Attack");
-			audio.PlayOneShot(swordSwipeSFX, 0.5f);
-		}
-
-		// Adjust current speed based on target speed
-		targetSpeed = moveDirX * speed;
-		currentSpeed = IncrementTowards(currentSpeed, targetSpeed, acceleration);
-
-		// Set amount to move
-		amountToMove.x = currentSpeed;
-
-		if (wallHolding) {
-			wallHoldTimer += Time.deltaTime;
-			amountToMove.x = 0;
-
-			//if (wallHoldTimer >= wallHoldLength)
-			//	wallHoldDir = 0;
-
-			if (Input.GetAxisRaw("Vertical") != -1) {
-				amountToMove.y = wallHoldTimer >= wallHoldLength ?
-					amountToMove.y + gravity / 2 * Time.deltaTime :
-					gravity * Time.deltaTime;
+			
+			if (Input.GetButtonDown("Jump")) {
+				if (playerPhysics.grounded || wallHolding && moveDirX + wallHoldDir == 0) {
+					amountToMove.y = jumpHeight;
+					
+					audio.PlayOneShot(Random.Range(0f, 1f) > .5f ? jump1SFX : jump2SFX); 
+					
+					if (wallHolding) {
+						wallHolding = false;
+						wallHoldTimer = 0;
+					}
+				}
 			}
+			
+			if (attacking) {
+				attackTimer += Time.deltaTime;
+				
+				if (attackTimer >= animation["Attack"].length) {
+					attacking = false;
+					attackTimer = 0;
+					sword.gameObject.SetActive(false);
+				}
+			}
+			
+			if (!attacking && !wallHolding && Input.GetButtonDown("Attack")) {
+				attacking = true;
+				sword.gameObject.SetActive(true);
+				animation.CrossFade("Attack");
+				audio.PlayOneShot(swordSwipeSFX, 0.5f);
+			}
+			
+			// Adjust current speed based on target speed
+			targetSpeed = moveDirX * speed;
+			currentSpeed = IncrementTowards(currentSpeed, targetSpeed, acceleration);
+			
+			// Set amount to move
+			amountToMove.x = currentSpeed;
+			
+			if (wallHolding) {
+				wallHoldTimer += Time.deltaTime;
+				amountToMove.x = 0;
+				
+				//if (wallHoldTimer >= wallHoldLength)
+				//	wallHoldDir = 0;
+				
+				if (Input.GetAxisRaw("Vertical") != -1) {
+					amountToMove.y = wallHoldTimer >= wallHoldLength ?
+						amountToMove.y + gravity / 2 * Time.deltaTime :
+							gravity * Time.deltaTime;
+				}
+			}
+			
+			amountToMove.y -= gravity * Time.deltaTime;
+			playerPhysics.Move(amountToMove * Time.deltaTime, moveDirX);
+			
+			// Face Direction
+			if (moveDirX != 0 && !wallHolding && !attacking)
+				transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
 		}
-
-		amountToMove.y -= gravity * Time.deltaTime;
-		playerPhysics.Move(amountToMove * Time.deltaTime, moveDirX);
-
-		// Face Direction
-		if (moveDirX != 0 && !wallHolding && !attacking)
-			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
 	void OnTriggerEnter(Collider other) {
@@ -158,14 +172,23 @@ public class PlayerController: MonoBehaviour {
 
 	}
 
-	public void TakeDamage(float damage, float dir) {
+	public void TakeDamage(float damage, float dir, float force) {
 		hitPoints -= damage;
 		hitPoints = Mathf.Max(0, hitPoints);
 
 		if (hitPoints == 0) {
 			Die();
 		} else {
-			playerPhysics.Move(new Vector2(1, 0), dir);
+			//playerPhysics.Move(new Vector2(1, 0), dir);
+			targetSpeed = 0;
+			currentSpeed = 0;
+
+			velocityX = force * -dir;
+			knockBackDirection = -dir;
+			
+			// Face Direction
+			//transform.eulerAngles = knockBackDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+			knockedBack = true;
 			audio.PlayOneShot(gruntSFX);
 		}
 	}
