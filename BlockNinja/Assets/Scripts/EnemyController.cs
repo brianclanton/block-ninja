@@ -11,6 +11,14 @@ public class EnemyController : MonoBehaviour {
 	private float deltaPosition;
 	private float currentDirection;
 
+	private float knockBackForce = 5;
+	private float knockBackDirection;
+	private float friction = 10;
+	private float velocityX;
+
+	// States
+	private bool knockedBack;
+
 	// Use this for initialization
 	void Start () {
 		currentPosition = 0;
@@ -19,19 +27,33 @@ public class EnemyController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		deltaPosition = IncrementTowards(currentPosition, movementRange / 2 * currentDirection, movementSpeed) - currentPosition;
+		if (!knockedBack) {
+			deltaPosition = IncrementTowards(currentPosition, movementRange / 2 * currentDirection, movementSpeed) - currentPosition;
+			
+			transform.Translate(deltaPosition * currentDirection, 0, 0);
+			currentPosition += deltaPosition;
+			//Debug.Log(currentPosition);
+			
+			if (Mathf.Abs(currentPosition) >= movementRange / 2) {
+				currentPosition = movementRange / 2 * currentDirection;
+				currentDirection *= -1;
+			}
 
-		transform.Translate(deltaPosition * currentDirection, 0, 0);
-		currentPosition += deltaPosition;
-		//Debug.Log(currentPosition);
+			// Face Direction
+			transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+		} else {
+			velocityX -= friction * knockBackDirection * Time.deltaTime;
+			deltaPosition = velocityX * Time.deltaTime;
 
-		if (Mathf.Abs(currentPosition) >= movementRange / 2) {
-			currentPosition = movementRange / 2 * currentDirection;
-			currentDirection *= -1;
+			Debug.Log(velocityX);
+
+			transform.Translate(deltaPosition, 0, 0);
+
+			if (Mathf.Sign(velocityX) != Mathf.Sign(knockBackDirection)) {
+				knockedBack = false;
+				velocityX = 0;
+			}
 		}
-
-		// Face Direction
-		transform.eulerAngles = currentDirection < 0 ? Vector3.up * 180 : Vector3.zero;
 	}
 
 	void OnTriggerEnter(Collider other) {
@@ -51,7 +73,14 @@ public class EnemyController : MonoBehaviour {
 		if (hitPoints == 0) {
 			Die();
 		} else {
-			transform.Translate(0.5f * -dir, 0, 0);
+			// transform.Translate(0.5f * -dir, 0, 0);
+			currentPosition = 0;
+			velocityX = knockBackForce * -dir;
+			knockBackDirection = -dir;
+
+			// Face Direction
+			transform.eulerAngles = knockBackDirection < 0 ? Vector3.up * 180 : Vector3.zero;
+			knockedBack = true;
 		}
 	}
 
