@@ -4,8 +4,6 @@ using System.Collections;
 [RequireComponent (typeof(PlayerPhysics))]
 public class PlayerController: MonoBehaviour {
 
-	public GameCamera camera;
-
 	// Player handling
 	public float gravity = 20;
 	public float speed = 8;
@@ -51,7 +49,7 @@ public class PlayerController: MonoBehaviour {
 		playerPhysics.SetLandingAudio(audio, landSFX);
 		sword = transform.Find("Hilt/Sword").gameObject.GetComponent<Sword>();
 		sword.gameObject.SetActive(false);
-		//manager = camera.GetComponent<GameManager>();
+		manager = Camera.main.GetComponent<GameManager>();
 		hitPoints = maxHitPoints;
 	}
 	
@@ -65,7 +63,6 @@ public class PlayerController: MonoBehaviour {
 		
 		// Input
 		moveDirX = Input.GetAxisRaw("Horizontal");
-		Debug.Log(moveDirX);
 
 		// Allow for jumping
 		if (playerPhysics.grounded) {
@@ -143,6 +140,15 @@ public class PlayerController: MonoBehaviour {
 		// Face Direction
 		if (moveDirX != 0 && !wallHolding && !attacking)
 			transform.eulerAngles = moveDirX < 0 ? Vector3.up * 180 : Vector3.zero;
+	}
+
+	void OnTriggerEnter(Collider other) {
+		if (other.tag == "Checkpoint") {
+			manager.SetCheckpoint(other.transform.position);
+		}
+		if (other.tag == "Goal") {
+			manager.EndLevel();
+		}
 	}
 
 	private void Attack() {
