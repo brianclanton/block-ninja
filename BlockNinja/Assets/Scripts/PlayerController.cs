@@ -149,6 +149,9 @@ public class PlayerController: MonoBehaviour {
 		if (other.tag == "Goal") {
 			manager.EndLevel();
 		}
+		if (other.tag == "Death Area") {
+			Die();
+		}
 	}
 
 	private void Attack() {
@@ -170,7 +173,6 @@ public class PlayerController: MonoBehaviour {
 	private void Die() {
 		Debug.Log("You died");
 		Destroy(gameObject);
-		//manager.SpawnPlayer();
 	}
 
 	// Increment current speed towards target speed using given acceleration
