@@ -13,7 +13,7 @@ public class EnemyController : MonoBehaviour {
 
 	private float knockBackForce = 5;
 	private float knockBackDirection;
-	private float friction = 10;
+	private float friction = 20;
 	private float velocityX;
 
 	// States
@@ -45,8 +45,6 @@ public class EnemyController : MonoBehaviour {
 			velocityX -= friction * knockBackDirection * Time.deltaTime;
 			deltaPosition = velocityX * Time.deltaTime;
 
-			Debug.Log(velocityX);
-
 			transform.Translate(deltaPosition, 0, 0);
 
 			if (Mathf.Sign(velocityX) != Mathf.Sign(knockBackDirection)) {
@@ -58,7 +56,7 @@ public class EnemyController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Player") {
-			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, other.transform.position.x - transform.position.x);
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x);
 		}
 	}
 
