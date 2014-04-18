@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour {
 
 	private Vector3 checkpoint;
 
-	public static int levelCount;
-	public static int currentLevel;
+	public static int levelCount = 4;
+	public static int currentLevel = 1;
 
 	// Use this for initialization
 	void Start () {
