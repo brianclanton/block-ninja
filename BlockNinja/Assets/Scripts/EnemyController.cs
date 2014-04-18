@@ -18,6 +18,9 @@ public class EnemyController : MonoBehaviour {
 	// States
 	private bool knockedBack;
 
+	// Sound FX
+	public AudioClip gruntSFX;
+
 	// Use this for initialization
 	void Start () {
 		currentPosition = 0;
@@ -78,6 +81,8 @@ public class EnemyController : MonoBehaviour {
 			// Face Direction
 			transform.eulerAngles = knockBackDirection < 0 ? Vector3.up * 180 : Vector3.zero;
 			knockedBack = true;
+
+			audio.PlayOneShot(gruntSFX);
 		}
 	}
 
