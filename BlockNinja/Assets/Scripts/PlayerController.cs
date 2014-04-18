@@ -29,7 +29,6 @@ public class PlayerController: MonoBehaviour {
 	private Vector2 amountToMove;
 	private float moveDirX;
 	private float wallHoldDir;
-	private float knockBackForce = 10;
 	private float knockBackDirection;
 	private float friction = 40;
 	private float velocityX;
@@ -173,7 +172,7 @@ public class PlayerController: MonoBehaviour {
 
 	}
 
-	public void TakeDamage(float damage, float dir) {
+	public void TakeDamage(float damage, float dir, float force) {
 		hitPoints -= damage;
 		hitPoints = Mathf.Max(0, hitPoints);
 
@@ -184,7 +183,7 @@ public class PlayerController: MonoBehaviour {
 			targetSpeed = 0;
 			currentSpeed = 0;
 
-			velocityX = knockBackForce * -dir;
+			velocityX = force * -dir;
 			knockBackDirection = -dir;
 			
 			// Face Direction

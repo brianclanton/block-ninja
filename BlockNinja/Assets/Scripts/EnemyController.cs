@@ -10,8 +10,7 @@ public class EnemyController : MonoBehaviour {
 	private float currentPosition;
 	private float deltaPosition;
 	private float currentDirection;
-
-	private float knockBackForce = 5;
+	
 	private float knockBackDirection;
 	private float friction = 20;
 	private float velocityX;
@@ -56,7 +55,7 @@ public class EnemyController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Player") {
-			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x);
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x, 10);
 		}
 	}
 
@@ -65,7 +64,7 @@ public class EnemyController : MonoBehaviour {
 		Destroy(gameObject);
 	}
 
-	public void TakeDamage(float damage, float dir) {
+	public void TakeDamage(float damage, float dir, float force) {
 		hitPoints -= damage;
 		hitPoints = Mathf.Max(0, hitPoints);
 		if (hitPoints == 0) {
@@ -73,7 +72,7 @@ public class EnemyController : MonoBehaviour {
 		} else {
 			// transform.Translate(0.5f * -dir, 0, 0);
 			currentPosition = 0;
-			velocityX = knockBackForce * -dir;
+			velocityX = force * -dir;
 			knockBackDirection = -dir;
 
 			// Face Direction
