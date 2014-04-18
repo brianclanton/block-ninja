@@ -146,8 +146,11 @@ public class PlayerController: MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other) {
-		if (other.tag == "Goal") {
-
+		if (other.tag == "Checkpoint") {
+			manager.SetCheckpoint(other.transform.position);
+		}
+		if (other.tag == "Finish") {
+			manager.EndLevel();
 		}
 	}
 
