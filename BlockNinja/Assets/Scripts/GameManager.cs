@@ -6,6 +6,9 @@ public class GameManager : MonoBehaviour {
 	public GameObject playerPrefab;
 	private GameObject currentPlayer;
 
+	public GUITexture screenFaderPrefab;
+	private SceneFadeInOut screenFader;
+
 	private GameCamera cam;
 
 	private Vector3 checkpoint;
@@ -16,6 +19,7 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		cam = GetComponent<GameCamera>();
+		screenFader = (Instantiate(screenFaderPrefab, Vector3.zero, Quaternion.identity) as GUITexture).GetComponent<SceneFadeInOut>();
 
 		if (GameObject.FindGameObjectWithTag("Spawn")) {
 			checkpoint = GameObject.FindGameObjectWithTag("Spawn").transform.position;
@@ -44,7 +48,8 @@ public class GameManager : MonoBehaviour {
 		if (currentLevel < levelCount) {
 			// Move to next level if there is one
 			currentLevel++;
-			Application.LoadLevel("Level " + currentLevel);
+			Debug.Log(currentLevel);
+			screenFader.EndScene("Level " + currentLevel);
 		} else {
 			// End the game
 			Debug.Log("Game Over");
