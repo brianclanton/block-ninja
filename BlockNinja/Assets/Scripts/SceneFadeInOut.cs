@@ -4,17 +4,14 @@ using System.Collections;
 public class SceneFadeInOut : MonoBehaviour
 {
 	public float fadeSpeed = 1.5f;          // Speed that the screen fades to and from black.
-	
-	
-	private bool sceneStarting = true;      // Whether or not the scene is still fading in.
-	
+	[HideInInspector]
+	public bool sceneStarting = true;      // Whether or not the scene is still fading in.
 	
 	void Awake ()
 	{
 		// Set the texture so that it is the the size of the screen and covers it.
 		guiTexture.pixelInset = new Rect(0f, 0f, Screen.width, Screen.height);
 	}
-	
 	
 	void Update ()
 	{
@@ -24,20 +21,17 @@ public class SceneFadeInOut : MonoBehaviour
 			StartScene();
 	}
 	
-	
 	void FadeToClear ()
 	{
 		// Lerp the colour of the texture between itself and transparent.
 		guiTexture.color = Color.Lerp(guiTexture.color, Color.clear, fadeSpeed * Time.deltaTime);
 	}
 	
-	
 	void FadeToBlack ()
 	{
 		// Lerp the colour of the texture between itself and black.
 		guiTexture.color = Color.Lerp(guiTexture.color, Color.red, fadeSpeed * Time.deltaTime);
 	}
-	
 	
 	void StartScene ()
 	{
@@ -56,7 +50,6 @@ public class SceneFadeInOut : MonoBehaviour
 		}
 	}
 	
-	
 	public void EndScene (string levelName)
 	{
 		// Make sure the texture is enabled.
@@ -64,10 +57,8 @@ public class SceneFadeInOut : MonoBehaviour
 		
 		// Start fading towards black.
 		FadeToBlack();
-		
-		// If the screen is almost black...
-		if(guiTexture.color.a >= 0.95f)
-			// ... reload the level.
-			Application.LoadLevel(0);
+
+		// Load the next level
+		Application.LoadLevel(levelName);
 	}
 }

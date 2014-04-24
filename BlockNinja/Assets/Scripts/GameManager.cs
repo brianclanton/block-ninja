@@ -34,6 +34,11 @@ public class GameManager : MonoBehaviour {
 				SpawnPlayer(checkpoint);
 	}
 
+	// Check if user interaction should be halted.
+	public bool InteractionHalted() {
+		return screenFader.sceneStarting;
+	}
+
 	private void SpawnPlayer(Vector3 spawnPos) {
 		// Set the camera target to the player
 		currentPlayer = Instantiate(playerPrefab, spawnPos, Quaternion.identity) as GameObject;
