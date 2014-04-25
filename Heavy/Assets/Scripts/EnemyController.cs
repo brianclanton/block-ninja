@@ -7,28 +7,28 @@ public class EnemyController : MonoBehaviour {
 	public float movementSpeed = 2;
 	public float hitPoints = 2;
 
-	private float currentPosition;
-	private float deltaPosition;
-	private float currentDirection;
+	protected float currentPosition;
+	protected float deltaPosition;
+	protected float currentDirection;
 	
-	private float knockBackDirection;
-	private float friction = 20;
-	private float velocityX;
+	protected float knockBackDirection;
+	protected float friction = 20;
+	protected float velocityX;
 
 	// States
-	private bool knockedBack;
+	protected bool knockedBack;
 
 	// Sound FX
 	public AudioClip gruntSFX;
 
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 		currentPosition = 0;
 		currentDirection = 1;
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected virtual void Update () {
 		if (!knockedBack) {
 			deltaPosition = IncrementTowards(currentPosition, movementRange / 2 * currentDirection, movementSpeed) - currentPosition;
 			
@@ -56,7 +56,7 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter(Collider other) {
+	protected virtual void OnTriggerEnter(Collider other) {
 		if (other.gameObject.tag == "Player") {
 			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x, 10);
 		}
@@ -86,7 +86,7 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	private float IncrementTowards(float current, float target, float a) {
+	protected float IncrementTowards(float current, float target, float a) {
 		if (current == target)
 			return current;
 		else {
