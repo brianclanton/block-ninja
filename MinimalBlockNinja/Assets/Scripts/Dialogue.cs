@@ -3,11 +3,11 @@ using System.Collections;
 
 public class Dialogue : MonoBehaviour {
 
+	public string nextScene;
 	public string[] dialogueElements;
-	public GameObject[] backgrounds;
 
 	private int currentIndex = 0;
-	private string currentText = "Asdf";
+	private string currentText;
 
 	// Use this for initialization
 	void Start () {
@@ -17,10 +17,11 @@ public class Dialogue : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!IsDone() && Input.GetButtonDown("Advance Dialogue")) {
-			currentText = dialogueElements[currentIndex++];
-			
-			Debug.Log (currentText);
+		if (Input.GetButtonDown("Advance Dialogue")) {
+			if (IsDone())
+				Application.LoadLevel(nextScene);
+			else
+				currentText = dialogueElements[currentIndex++];
 		}
 	}
 
