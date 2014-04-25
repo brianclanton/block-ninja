@@ -17,8 +17,12 @@ public class Dialogue : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetButtonDown("Advance Dialogue")) {
-			if (IsDone())
-				Application.LoadLevel(nextScene);
+			if (IsDone()) {
+				if (!nextScene.Equals(""))
+					Application.LoadLevel(nextScene);
+				else
+					Application.CancelQuit();
+			}
 			else
 				currentText = dialogueElements[currentIndex++];
 		}
