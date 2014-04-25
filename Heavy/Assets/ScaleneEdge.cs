@@ -24,6 +24,13 @@ public class ScaleneEdge : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter(Collider other) {
+		if (other.gameObject.tag == "Player") {
+			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x, 10);
+			Destroy(gameObject);
+		}
+	}
+
 	public void SetSpeed(float speed) {
 		this.speed = speed;
 	}
