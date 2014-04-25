@@ -29,6 +29,10 @@ public class ScaleneEdge : MonoBehaviour {
 			other.gameObject.GetComponent<PlayerController>().TakeDamage(1, transform.position.x - other.transform.position.x, 10);
 			Destroy(gameObject);
 		}
+		if (other.gameObject.tag == "Enemy") {
+			other.gameObject.GetComponent<EnemyController>().TakeDamage(1, transform.position.x - other.transform.position.x, 5);
+			Destroy(gameObject);
+		}
 	}
 
 	public void SetSpeed(float speed) {
@@ -39,6 +43,10 @@ public class ScaleneEdge : MonoBehaviour {
 		isLaunched = true;
 		startingX = transform.position.x;
 		transform.eulerAngles = Vector3.up * 180;
+	}
+
+	public void Reflect() {
+		transform.eulerAngles = Vector3.zero;
 	}
 
 }
