@@ -12,7 +12,6 @@ public class Dialogue : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		currentText = dialogueElements[currentIndex++];
-		Debug.Log (currentText);
 	}
 	
 	// Update is called once per frame
