@@ -9,6 +9,9 @@ public class ScaleneEdge : MonoBehaviour {
 	private float startingX;
 	private float maxDistance = 25f;
 
+	private float launchDelay;
+	private float launchTimer = 0f;
+
 	// Use this for initialization
 	void Start () {
 
@@ -16,7 +19,9 @@ public class ScaleneEdge : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (isLaunched) {
+		if (isLaunched && launchTimer < launchDelay) {
+			launchTimer += Time.deltaTime;
+		} else {
 			transform.Translate(speed * Time.deltaTime, 0, 0);
 
 			if (Mathf.Abs(transform.position.x - startingX) >= maxDistance)
@@ -39,14 +44,16 @@ public class ScaleneEdge : MonoBehaviour {
 		this.speed = speed;
 	}
 
-	public void Launch() {
+	public void Launch(float launchDelay) {
+		this.launchDelay = launchDelay;
 		isLaunched = true;
 		startingX = transform.position.x;
 		transform.eulerAngles = Vector3.up * 180;
 	}
 
 	public void Reflect() {
-		transform.eulerAngles = Vector3.zero;
+		if (launchTimer >= launchDelay)
+			transform.eulerAngles = Vector3.zero;
 	}
 
 }

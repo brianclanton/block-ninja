@@ -4,13 +4,15 @@ using System.Collections;
 public class TriangleMiserController : EnemyController {
 
 	public GameObject swordPrefab;
-	public float speedThrowingRate = 3f;
+	public float baseSpeedThrowingRate = 3f;
 
+	private float speedThrowingRate;
 	private float throwingCounter = 0f;
 
 	// Use this for initialization
 	protected override void Start () {
-	
+		hitPoints = maxHitpoints;
+		speedThrowingRate = baseSpeedThrowingRate;
 	}
 	
 	// Update is called once per frame
@@ -43,6 +45,12 @@ public class TriangleMiserController : EnemyController {
 			 as GameObject).GetComponent<ScaleneEdge>();
 
 		tempSword.SetSpeed(speed);
-		tempSword.Launch();
+		tempSword.Launch(hitPoints / maxHitpoints * 1f);
+	}
+
+	public override void TakeDamage(float damage, float dir, float force) {
+		base.TakeDamage(damage, dir, force);
+
+		speedThrowingRate = Mathf.Max(0.5f, hitPoints / maxHitpoints * baseSpeedThrowingRate);
 	}
 }

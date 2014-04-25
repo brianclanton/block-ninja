@@ -5,7 +5,9 @@ public class EnemyController : MonoBehaviour {
 
 	public float movementRange = 2;
 	public float movementSpeed = 2;
-	public float hitPoints = 2;
+	public float maxHitpoints = 2;
+	[HideInInspector]
+	public float hitPoints;
 
 	protected float currentPosition;
 	protected float deltaPosition;
@@ -25,6 +27,7 @@ public class EnemyController : MonoBehaviour {
 	protected virtual void Start () {
 		currentPosition = 0;
 		currentDirection = 1;
+		hitPoints = maxHitpoints;
 	}
 	
 	// Update is called once per frame
@@ -67,7 +70,7 @@ public class EnemyController : MonoBehaviour {
 		Destroy(gameObject);
 	}
 
-	public void TakeDamage(float damage, float dir, float force) {
+	public virtual void TakeDamage(float damage, float dir, float force) {
 		hitPoints -= damage;
 		hitPoints = Mathf.Max(0, hitPoints);
 		if (hitPoints == 0) {
