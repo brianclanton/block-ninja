@@ -13,5 +13,8 @@ public class Sword : MonoBehaviour {
 		if (other.tag == "Enemy") {
 			other.gameObject.GetComponent<EnemyController>().TakeDamage(1, Mathf.Sign(other.transform.position.x - transform.position.x), 5);
 		}
+		if (other.tag == "Weapon") {
+			other.gameObject.GetComponent<ScaleneEdge>().Reflect();
+		}
 	}
 }
