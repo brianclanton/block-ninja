@@ -36,7 +36,7 @@ public class Dialogue : MonoBehaviour {
 		GUI.skin.box.wordWrap = true;
 
 		// Actual dialog box
-		GUI.Box(new Rect(475, Screen.height - 150, Screen.width - 950, 150), currentText);
+		GUI.Box(new Rect(200, Screen.height - 150, 700, 150), currentText);
 		GUI.Label(new Rect(Screen.width - 475 - 175, Screen.height - 25, 200, 30), "Press Space to continue...");
 	}
 
