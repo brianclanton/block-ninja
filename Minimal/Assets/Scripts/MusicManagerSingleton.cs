@@ -27,6 +27,7 @@ public class MusicManagerSingleton : MonoBehaviour {
 	}
 
 	void OnLevelWasLoaded(int level) {
-		audio.time = currentTime;
+		if (level != 4)
+			audio.time = currentTime;
 	}
 }
